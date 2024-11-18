@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+// App.js
+import React, { useState, useRef } from 'react';
 import TextBox from './TextBox';
 import axios from 'axios';
+import { keyMap } from './keyMap';
 
 function App() {
   const [keyDelays, setKeyDelays] = useState([]);
   const threshold = 2000; // 2 seconds threshold
+  const keyDownTimesRef = useRef(JSON.parse(JSON.stringify(keyMap))); // Deep clone
 
   const questions = [
     "What is your favorite color?",
@@ -20,15 +23,24 @@ function App() {
   ];
 
   const handleKeyDelay = (delayData) => {
-    console.log(keyDelays);
-
     setKeyDelays((prevKeyDelays) => [...prevKeyDelays, delayData]);
   };
 
   const handleSubmit = async () => {
+    // Prepare keydown delays to send to backend
+    const keydownDelays = {};
+
+    // Maintain the exact order and keys from keyMap
+    Object.keys(keyMap).forEach(key => {
+      const [totalDelay, count] = keyDownTimesRef.current[key];
+      keydownDelays[key] = count > 0 ? Number((totalDelay / count).toFixed(2)) : 0;
+    });
+
+    console.log(keyDelays, keydownDelays);
     try {
       const response = await axios.post('http://localhost:3500/getInput', {
-        input: keyDelays, // Send the keyDelays array to the backend
+        input: keyDelays,
+        keydownDelays: keydownDelays
       });
       console.log('Data sent successfully:', response.data);
     } catch (error) {
@@ -44,22 +56,11 @@ function App() {
           key={index}
           question={question}
           onKeyDelay={handleKeyDelay}
-          threshold={threshold} // Pass the threshold to each TextBox
+          threshold={threshold}
+          keyDownTimesRef={keyDownTimesRef}
         />
       ))}
 
-      {/* <div style={{ marginTop: '20px', textAlign: 'left' }}>
-        <h4>Key Delays (ignoring pauses longer than {threshold} ms):</h4>
-        <ul>
-          {keyDelays.map((entry, index) => (
-            <li key={index}>
-              {entry.keys}: {entry.delay}
-            </li>
-          ))}
-        </ul>
-      </div> */}
-
-      {/* Submit Button */}
       <button onClick={handleSubmit} style={{ marginTop: '20px', padding: '10px 20px' }}>
         Submit Answers
       </button>
