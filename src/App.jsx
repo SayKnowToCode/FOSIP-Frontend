@@ -36,7 +36,8 @@ function App() {
       keydownDelays[key] = count > 0 ? Number((totalDelay / count).toFixed(2)) : 0;
     });
 
-    console.log(keyDelays, keydownDelays);
+    console.log(keydownDelays);
+    // console.log(Object.keys(keydownDelays).length);
     try {
       const response = await axios.post('http://localhost:3500/getInput', {
         input: keyDelays,

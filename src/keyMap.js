@@ -20,5 +20,4 @@ export const keyMap = {
     "Ctrl": [0, 0], "Alt": [0, 0], "CapsLock": [0, 0], "NumLock": [0, 0],
     "Space": [0, 0], "PageUp": [0, 0], "PageDown": [0, 0], "ArrowLeft": [0, 0],
     "ArrowRight": [0, 0], "ArrowUp": [0, 0], "ArrowDown": [0, 0],
-    // Add other keys here if necessary
 };
